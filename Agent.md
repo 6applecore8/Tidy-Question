@@ -82,10 +82,14 @@
 - 不输出 API Key、JWT、数据库密码等敏感信息。
 - 不根据用户输入执行危险系统命令。
 - 仅在授权接口中读写训练和文档数据。
--隐私信息统一放在application-local文件中，而非放在application中，且在gitinore中隐藏local
+- 隐私信息统一放在 application-local* 文件中，不放在 application* 公共配置中。
+- application-local* 已通过 .gitignore 忽略：Agent 不再主动提示该事项，也不对其做改动；仅在用户明确要求时才修改。
 
 ## 7. Observability
 
 - 必打日志字段：`traceId`、`userId`、`module`、`action`、`costMs`。
 - 错误日志必须包含异常栈。
 - 对外响应统一包含 `traceId`，便于前后端联调排障。
+
+
+

@@ -32,6 +32,9 @@ management:
         include: health,info,metrics
 
 logging:
+  charset:
+    console: UTF-8
+    file: UTF-8
   level:
     root: INFO
     com.tidyquestion.backend: INFO
@@ -59,3 +62,4 @@ app:
     chat-model: ${APP_MODEL_CHAT:qwen-plus}
     embedding-model: ${APP_MODEL_EMBEDDING:text-embedding-v4}
     timeout-seconds: ${APP_MODEL_TIMEOUT_SECONDS:45}
+

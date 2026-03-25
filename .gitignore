@@ -1,0 +1,65 @@
+﻿# =========================
+# Sensitive / Local Secrets
+# =========================
+.env
+.env.*
+!.env.example
+!.env.*.example
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.*.example
+
+# Local config overrides
+**/application-local.yml
+**/application-local.yaml
+
+# Keys / certificates
+*.pem
+*.key
+*.p12
+*.jks
+*.keystore
+id_rsa
+id_rsa.pub
+id_ed25519
+id_ed25519.pub
+
+# =========================
+# Runtime Data / Logs
+# =========================
+# App runtime data
+/data/
+backend/data/
+**/uploads/
+
+# Logs
+*.log
+logs/
+**/logs/
+backend/boot-run*.log
+
+# Local SQL scratch / dumps (potentially sensitive)
+*.session.sql
+*.dump
+*.bak
+
+# =========================
+# Build / Dependency Output
+# =========================
+# Java
+backend/target/
+
+# Frontend
+fronted/node_modules/
+fronted/dist/
+
+# =========================
+# IDE / OS
+# =========================
+.idea/
+.vscode/
+*.iml
+
+.DS_Store
+Thumbs.db

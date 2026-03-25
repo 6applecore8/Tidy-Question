@@ -1,0 +1,431 @@
+﻿openapi: 3.0.3
+info:
+  title: Tidy Question Backend API
+  version: 1.0.0
+  description: |
+    Backend API for document RAG + interview quiz training.
+servers:
+  - url: http://localhost:8080
+paths:
+  /api/auth/login:
+    post:
+      summary: Login and get JWT token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            example:
+              username: admin
+              password: "123456"
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseLogin'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /api/docs/upload:
+    post:
+      summary: Upload knowledge document
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseUpload'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /api/docs/{docId}/index:
+    post:
+      summary: Parse and index one document
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: docId
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseIndex'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /api/docs:
+    get:
+      summary: List uploaded documents
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseDocList'
+  /api/chat/ask:
+    post:
+      summary: Non-streaming RAG QA
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AskRequest'
+            example:
+              question: JVM 内存结构是什么
+              topK: 4
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseAsk'
+  /api/quiz/session/start:
+    post:
+      summary: Start one quiz session
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StartSessionRequest'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseStartSession'
+  /api/quiz/session/{id}/answer:
+    post:
+      summary: Submit answer and get evaluation
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnswerRequest'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseAnswer'
+  /api/review/weak-points:
+    get:
+      summary: Get weak-point summary from historical scores
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseWeakPoints'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    UnauthorizedError:
+      description: unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseError'
+          example:
+            code: 1002
+            message: 未授权访问
+            data: null
+            traceId: 8c802d41f60b4c0e8f2cd8f4f201443f
+    BadRequestError:
+      description: bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseError'
+          example:
+            code: 1001
+            message: 请求参数错误
+            data: null
+            traceId: 8c802d41f60b4c0e8f2cd8f4f201443f
+  schemas:
+    ApiResponseError:
+      type: object
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+        data:
+          nullable: true
+        traceId:
+          type: string
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    LoginResponse:
+      type: object
+      properties:
+        userId:
+          type: integer
+          format: int64
+        username:
+          type: string
+        token:
+          type: string
+        expireHours:
+          type: integer
+          format: int64
+    ApiResponseLogin:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponseError'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/LoginResponse'
+    DocumentUploadResponse:
+      type: object
+      properties:
+        docId:
+          type: integer
+          format: int64
+        status:
+          type: string
+    ApiResponseUpload:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponseError'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/DocumentUploadResponse'
+    DocumentIndexResponse:
+      type: object
+      properties:
+        docId:
+          type: integer
+          format: int64
+        status:
+          type: string
+        chunkCount:
+          type: integer
+    ApiResponseIndex:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponseError'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/DocumentIndexResponse'
+    DocumentView:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        fileName:
+          type: string
+        contentType:
+          type: string
+        status:
+          type: string
+        chunkCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    ApiResponseDocList:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponseError'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/DocumentView'
+    AskRequest:
+      type: object
+      required: [question]
+      properties:
+        question:
+          type: string
+        topK:
+          type: integer
+    Citation:
+      type: object
+      properties:
+        chunkId:
+          type: integer
+          format: int64
+        documentId:
+          type: integer
+          format: int64
+        chunkIndex:
+          type: integer
+        content:
+          type: string
+        score:
+          type: number
+          format: double
+    AskResponse:
+      type: object
+      properties:
+        answer:
+          type: string
+        citations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Citation'
+        costMs:
+          type: integer
+          format: int64
+        retrievalMode:
+          type: string
+    ApiResponseAsk:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponseError'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/AskResponse'
+    StartSessionRequest:
+      type: object
+      required: [topic, difficulty]
+      properties:
+        topic:
+          type: string
+        difficulty:
+          type: string
+    StartSessionResponse:
+      type: object
+      properties:
+        sessionId:
+          type: integer
+          format: int64
+        topic:
+          type: string
+        difficulty:
+          type: string
+        question:
+          type: string
+        status:
+          type: string
+    ApiResponseStartSession:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponseError'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/StartSessionResponse'
+    AnswerRequest:
+      type: object
+      required: [answer]
+      properties:
+        answer:
+          type: string
+    AnswerResponse:
+      type: object
+      properties:
+        sessionId:
+          type: integer
+          format: int64
+        question:
+          type: string
+        userAnswer:
+          type: string
+        llmScore:
+          type: integer
+        ruleScore:
+          type: integer
+        finalScore:
+          type: integer
+        keyPoints:
+          type: array
+          items:
+            type: string
+        strengths:
+          type: string
+        improvements:
+          type: string
+        idealAnswer:
+          type: string
+        nextQuestion:
+          type: string
+    ApiResponseAnswer:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponseError'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/AnswerResponse'
+    WeakPointItem:
+      type: object
+      properties:
+        topic:
+          type: string
+        avgScore:
+          type: number
+        attemptCount:
+          type: integer
+          format: int64
+        suggestion:
+          type: string
+    ApiResponseWeakPoints:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponseError'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/WeakPointItem'

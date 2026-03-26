@@ -49,6 +49,14 @@ backend/boot-run*.log
 # =========================
 # Java
 backend/target/
+backend/.m2/
+backend/.mvn/jvm.config
+
+# Keep Maven Wrapper core files, but ignore local wrapper/runtime caches
+!backend/.mvn/
+!backend/.mvn/wrapper/
+!backend/.mvn/wrapper/maven-wrapper.jar
+!backend/.mvn/wrapper/maven-wrapper.properties
 
 # Frontend
 fronted/node_modules/

@@ -1,4 +1,4 @@
-﻿openapi: 3.0.3
+openapi: 3.0.3
 info:
   title: Tidy Question Backend API
   version: 1.0.0
@@ -87,6 +87,37 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponseDocList'
+  /api/docs/{docId}/content:
+    get:
+      summary: Get parsed document text content
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: docId
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - in: query
+          name: maxChars
+          required: false
+          schema:
+            type: integer
+            minimum: 200
+            maximum: 200000
+          description: Maximum number of characters to return. Default is 12000.
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseDocContent'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
   /api/chat/ask:
     post:
       summary: Non-streaming RAG QA
@@ -99,7 +130,7 @@ paths:
             schema:
               $ref: '#/components/schemas/AskRequest'
             example:
-              question: JVM 内存结构是什么
+              question: What is JVM memory structure?
               topK: 4
       responses:
         '200':
@@ -178,8 +209,7 @@ components:
             $ref: '#/components/schemas/ApiResponseError'
           example:
             code: 1002
-            message: 未授权访问
-            data: null
+            message: 闂備礁鎼悧婊勭濠靛棭鍟呴柛褎顨呯痪褔鏌涢幇闈涘季闁哥喎绻樺?            data: null
             traceId: 8c802d41f60b4c0e8f2cd8f4f201443f
     BadRequestError:
       description: bad request
@@ -189,8 +219,7 @@ components:
             $ref: '#/components/schemas/ApiResponseError'
           example:
             code: 1001
-            message: 请求参数错误
-            data: null
+            message: 闂佽崵濮村ú顓㈠绩闁秵鍎戝ù鍏兼綑閻鏌涚仦鍓р姇婵炲牆鐖煎娲箰鎼达絾鍣?            data: null
             traceId: 8c802d41f60b4c0e8f2cd8f4f201443f
   schemas:
     ApiResponseError:
@@ -293,6 +322,31 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/DocumentView'
+    DocumentContentResponse:
+      type: object
+      properties:
+        docId:
+          type: integer
+          format: int64
+        fileName:
+          type: string
+        status:
+          type: string
+        content:
+          type: string
+        totalChars:
+          type: integer
+        returnedChars:
+          type: integer
+        truncated:
+          type: boolean
+    ApiResponseDocContent:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponseError'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/DocumentContentResponse'
     AskRequest:
       type: object
       required: [question]
@@ -429,3 +483,7 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/WeakPointItem'
+
+
+
+

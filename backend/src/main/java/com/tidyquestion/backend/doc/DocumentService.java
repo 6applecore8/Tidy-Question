@@ -2,6 +2,7 @@
 
 import com.tidyquestion.backend.common.BusinessException;
 import com.tidyquestion.backend.common.ErrorCode;
+import com.tidyquestion.backend.doc.dto.DocumentContentResponse;
 import com.tidyquestion.backend.doc.dto.DocumentIndexResponse;
 import com.tidyquestion.backend.doc.dto.DocumentUploadResponse;
 import com.tidyquestion.backend.doc.dto.DocumentView;
@@ -26,13 +27,12 @@ import java.util.UUID;
 
 /**
  * 文档服务。
- *
- * 负责文档上传、索引（解析+分块+向量化）和列表查询。
  */
 @Service
 public class DocumentService {
 
     private static final Logger log = LoggerFactory.getLogger(DocumentService.class);
+    private static final int DEFAULT_PREVIEW_MAX_CHARS = 12000;
 
     private final DocumentRepository documentRepository;
     private final DocumentChunkRepository documentChunkRepository;
@@ -162,5 +162,37 @@ public class DocumentService {
                         it.updatedAt()
                 ))
                 .toList();
+    }
+
+    /**
+     * 查看文档原始解析内容（用于前端预览）。
+     */
+    public DocumentContentResponse content(Long docId, Integer maxChars) {
+        Long userId = userContext.getCurrentUserId();
+        DocumentRecord doc = documentRepository.findById(docId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.DOC_NOT_FOUND, "文档不存在: " + docId));
+
+        if (!doc.userId().equals(userId)) {
+            throw new BusinessException(ErrorCode.FORBIDDEN, "无权限查看该文档");
+        }
+
+        int finalMaxChars = (maxChars == null || maxChars <= 0) ? DEFAULT_PREVIEW_MAX_CHARS : maxChars;
+        String rawContent = documentParserService.parse(Path.of(doc.storagePath()), doc.fileName());
+        int totalChars = rawContent.length();
+        boolean truncated = totalChars > finalMaxChars;
+        String previewContent = truncated ? rawContent.substring(0, finalMaxChars) : rawContent;
+
+        log.info("module=document action=content result=success userId={} docId={} totalChars={} returnedChars={} truncated={} maxChars={}",
+                userId, docId, totalChars, previewContent.length(), truncated, finalMaxChars);
+
+        return new DocumentContentResponse(
+                doc.id(),
+                doc.fileName(),
+                doc.status(),
+                previewContent,
+                totalChars,
+                previewContent.length(),
+                truncated
+        );
     }
 }

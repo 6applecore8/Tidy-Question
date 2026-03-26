@@ -58,7 +58,7 @@ curl -X GET "http://localhost:8080/api/docs" \
 curl -X POST "http://localhost:8080/api/chat/ask" \
   -H "Authorization: Bearer <JWT_TOKEN>" \
   -H "Content-Type: application/json" \
-  -d '{"question":"JVM内存结构是什么？","topK":4}'
+  -d '{"question":"JVM閸愬懎鐡ㄧ紒鎾寸€弰顖欑矆娑斿牞绱?,"topK":4}'
 ```
 
 ## 6) Start quiz session
@@ -76,7 +76,7 @@ curl -X POST "http://localhost:8080/api/quiz/session/start" \
 curl -X POST "http://localhost:8080/api/quiz/session/1/answer" \
   -H "Authorization: Bearer <JWT_TOKEN>" \
   -H "Content-Type: application/json" \
-  -d '{"answer":"Spring IOC 是控制反转..."}'
+  -d '{"answer":"Spring IOC 閺勵垱甯堕崚璺哄冀鏉?.."}'
 ```
 
 ## 8) Weak point summary
@@ -88,14 +88,32 @@ curl -X GET "http://localhost:8080/api/review/weak-points" \
 
 ## Error Codes
 
-- `1001` 请求参数错误
-- `1002` 未授权访问
-- `1003` 禁止访问
-- `2001` 文档上传失败
-- `2002` 文档索引失败
-- `2003` 文档不存在
-- `3001` 模型调用失败
-- `3002` 向量生成失败
-- `4001` 训练会话不存在
-- `4002` 训练评分失败
-- `9000` 系统内部错误
+- `1001` 鐠囬攱鐪伴崣鍌涙殶闁挎瑨顕?- `1002` 閺堫亝宸块弶鍐問闂?- `1003` 缁備焦顒涚拋鍧楁６
+- `2001` 閺傚洦銆傛稉濠佺炊婢惰精瑙?- `2002` 閺傚洦銆傜槐銏犵穿婢惰精瑙?- `2003` 閺傚洦銆傛稉宥呯摠閸?- `3001` 濡€崇€风拫鍐暏婢惰精瑙?- `3002` 閸氭垿鍣洪悽鐔稿灇婢惰精瑙?- `4001` 鐠侇厾绮屾导姘崇樈娑撳秴鐡ㄩ崷?- `4002` 鐠侇厾绮岀拠鍕瀻婢惰精瑙?- `9000` 缁崵绮洪崘鍛村劥闁挎瑨顕?
+
+
+## 9) View document content
+
+```bash
+curl -X GET "http://localhost:8080/api/docs/1/content?maxChars=8000" \
+  -H "Authorization: Bearer <JWT_TOKEN>"
+```
+
+Success response example:
+
+```json
+{
+  "code": 0,
+  "message": "OK",
+  "data": {
+    "docId": 1,
+    "fileName": "java-notes.pdf",
+    "status": "INDEXED",
+    "content": "...preview text...",
+    "totalChars": 24567,
+    "returnedChars": 8000,
+    "truncated": true
+  },
+  "traceId": "..."
+}
+```

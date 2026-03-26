@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <el-card shadow="never">
     <template #header>
       <div class="header-row">
@@ -11,7 +11,7 @@
 
     <el-skeleton v-else-if="loading" :rows="4" animated />
 
-    <el-empty v-else-if="documents.length === 0" description="暂无文档，请先上传" />
+    <el-empty v-else-if="documents.length === 0" description="No documents yet. Upload one first." />
 
     <el-table v-else :data="documents" stripe>
       <el-table-column prop="id" label="ID" width="80" />
@@ -27,16 +27,25 @@
           {{ formatDate(row.updatedAt) }}
         </template>
       </el-table-column>
-      <el-table-column label="Action" width="140" fixed="right">
+      <el-table-column label="Action" width="230" fixed="right">
         <template #default="{ row }">
-          <el-button
-            size="small"
-            type="primary"
-            :loading="indexingIds.has(row.id)"
-            @click="emit('index', row.id)"
-          >
-            Index
-          </el-button>
+          <div class="action-buttons">
+            <el-button
+              size="small"
+              type="primary"
+              :loading="indexingIds.has(row.id)"
+              @click="emit('index', row.id)"
+            >
+              Index
+            </el-button>
+            <el-button
+              size="small"
+              :loading="viewingIds.has(row.id)"
+              @click="emit('view-content', row.id, row.fileName)"
+            >
+              View Content
+            </el-button>
+          </div>
         </template>
       </el-table-column>
     </el-table>
@@ -53,11 +62,13 @@ defineProps<{
   loading: boolean;
   error: string;
   indexingIds: Set<number>;
+  viewingIds: Set<number>;
 }>();
 
 const emit = defineEmits<{
   refresh: [];
   index: [docId: number];
+  'view-content': [docId: number, fileName: string];
 }>();
 
 function tagType(status: string): TagProps['type'] {
@@ -88,5 +99,10 @@ function formatDate(value: string): string {
 
 .state-block {
   margin-bottom: 12px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
 }
 </style>

@@ -1,9 +1,11 @@
 ﻿package com.tidyquestion.backend.doc;
 
 import com.tidyquestion.backend.common.ApiResponse;
+import com.tidyquestion.backend.doc.dto.DocumentContentResponse;
 import com.tidyquestion.backend.doc.dto.DocumentIndexResponse;
 import com.tidyquestion.backend.doc.dto.DocumentUploadResponse;
 import com.tidyquestion.backend.doc.dto.DocumentView;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -52,5 +54,17 @@ public class DocumentController {
     @GetMapping
     public ApiResponse<List<DocumentView>> list() {
         return ApiResponse.success(documentService.list());
+    }
+
+    /**
+     * 查看文档解析内容。
+     */
+    @GetMapping("/{docId}/content")
+    public ApiResponse<DocumentContentResponse> content(
+            @PathVariable @Min(value = 1, message = "docId 不合法") Long docId,
+            @RequestParam(value = "maxChars", required = false)
+            @Min(value = 200, message = "maxChars 必须 >= 200")
+            @Max(value = 200000, message = "maxChars 必须 <= 200000") Integer maxChars) {
+        return ApiResponse.success(documentService.content(docId, maxChars));
     }
 }

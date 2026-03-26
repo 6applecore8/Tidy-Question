@@ -1,4 +1,4 @@
-import client from '@/shared/http/client';
+﻿import client from '@/shared/http/client';
 
 export interface DocumentUploadResponse {
   docId: number;
@@ -21,6 +21,16 @@ export interface DocumentView {
   updatedAt: string;
 }
 
+export interface DocumentContentResponse {
+  docId: number;
+  fileName: string;
+  status: string;
+  content: string;
+  totalChars?: number;
+  returnedChars?: number;
+  truncated?: boolean;
+}
+
 export async function uploadDocument(file: File): Promise<DocumentUploadResponse> {
   const formData = new FormData();
   formData.append('file', file);
@@ -37,4 +47,8 @@ export function indexDocument(docId: number): Promise<DocumentIndexResponse> {
 
 export function listDocuments(): Promise<DocumentView[]> {
   return client.get('/api/docs');
+}
+
+export function getDocumentContent(docId: number): Promise<DocumentContentResponse> {
+  return client.get(`/api/docs/${docId}/content`);
 }

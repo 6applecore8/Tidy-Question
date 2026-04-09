@@ -60,3 +60,6 @@ docker compose up -d postgres
 docker compose ps
 停止
 docker compose stop postgres
+
+partassist.exe /resize:D /reduce-left:20GB /align
+partassist.exe /resize:C /extend:right /align

@@ -50,7 +50,7 @@ function handleNavigate(path: string): void {
 
 function handleLogout(): void {
   authStore.logout();
-  ElMessage.success('已退出登录');
+  ElMessage.success('Logged out');
   router.push('/login');
 }
 </script>

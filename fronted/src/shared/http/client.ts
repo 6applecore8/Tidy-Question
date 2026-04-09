@@ -1,12 +1,12 @@
-import axios, { AxiosError, type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from 'axios';
+﻿import axios, { AxiosError, type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from 'axios';
 
 import { API_BASE_URL } from '@/shared/constants/env';
 import { clearAuthSnapshot, readAuthSnapshot } from '@/shared/utils/auth-storage';
 import { ApiBusinessError, type ApiResponse } from '@/shared/types/api';
 
 function redirectToLogin(): void {
-  if (window.location.pathname !== '/login') {
-    window.location.replace('/login');
+  if (window.location.pathname !== '/signin') {
+    window.location.replace('/signin');
   }
 }
 
@@ -34,7 +34,7 @@ instance.interceptors.response.use(
       redirectToLogin();
     }
 
-    const message = payload?.message || error.message || '网络异常，请稍后重试';
+    const message = payload?.message || error.message || '缃戠粶寮傚父锛岃绋嶅悗閲嶈瘯';
     const code = payload?.code ?? 9000;
     const traceId = payload?.traceId;
 
@@ -47,7 +47,7 @@ async function unwrap<T>(request: Promise<AxiosResponse<ApiResponse<T>>>): Promi
   const payload = response.data;
 
   if (typeof payload?.code !== 'number') {
-    throw new ApiBusinessError('服务响应格式异常', 9000, undefined, response.status);
+    throw new ApiBusinessError('鏈嶅姟鍝嶅簲鏍煎紡寮傚父', 9000, undefined, response.status);
   }
 
   if (payload.code !== 0) {
@@ -55,7 +55,7 @@ async function unwrap<T>(request: Promise<AxiosResponse<ApiResponse<T>>>): Promi
       clearAuthSnapshot();
       redirectToLogin();
     }
-    throw new ApiBusinessError(payload.message || '请求失败', payload.code, payload.traceId, response.status);
+    throw new ApiBusinessError(payload.message || '璇锋眰澶辫触', payload.code, payload.traceId, response.status);
   }
 
   return payload.data;

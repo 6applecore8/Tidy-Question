@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <el-container class="layout">
     <el-header class="layout-header">
       <div class="brand">Tidy Question</div>
@@ -51,7 +51,7 @@ function handleNavigate(path: string): void {
 function handleLogout(): void {
   authStore.logout();
   ElMessage.success('Logged out');
-  router.push('/login');
+  router.push('/signin');
 }
 </script>
 

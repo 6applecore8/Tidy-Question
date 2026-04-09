@@ -25,12 +25,12 @@
       <div class="hero-overlay"></div>
 
       <div class="hero-content">
-        <div class="hero-badge reveal reveal-1">为您的品牌量身打造</div>
-        <h1 class="hero-title reveal reveal-2">智能设计，温暖呈现</h1>
-        <p class="hero-copy reveal reveal-3">
+        <div class="hero-badge hero-reveal hero-reveal-1">为您的品牌量身打造</div>
+        <h1 class="hero-title hero-reveal hero-reveal-2">智能设计，温暖呈现</h1>
+        <p class="hero-copy hero-reveal hero-reveal-3">
           我们相信好的设计应该让人感到舒适、克制而有力量。让视频先抓住情绪，再让内容慢慢展开。
         </p>
-        <div class="hero-actions reveal reveal-4">
+        <div class="hero-actions hero-reveal hero-reveal-4">
           <RouterLink class="hero-primary" to="/signin">
             免费试用
             <span aria-hidden="true">↗</span>
@@ -40,30 +40,36 @@
       </div>
     </section>
 
-    <section id="features" class="section section-wide">
-      <div class="section-heading centered">
+    <section id="features" class="section section-wide content-section" data-scroll-section>
+      <div class="section-heading centered section-intro">
         <div class="section-badge">核心功能</div>
         <h2>让创意自然生长</h2>
-        <p>以视频为入口，以系统化能力为支撑，把品牌表达、设计效率与上线速度整合到同一条路径里。</p>
+        <p>从灵感到上线，AI 为您处理每一个技术细节，您只需专注于创意本身。</p>
       </div>
 
       <div class="feature-grid">
-        <article v-for="(item, index) in features" :key="item.title" class="glass-card reveal-card" :style="{ animationDelay: `${index * 0.1}s` }">
-          <div class="card-icon">{{ item.icon }}</div>
+        <article
+          v-for="item in features"
+          :key="item.title"
+          class="feature-card reveal-item"
+        >
+          <div class="feature-icon-ring">
+            <div class="feature-icon">{{ item.icon }}</div>
+          </div>
           <h3>{{ item.title }}</h3>
           <p>{{ item.description }}</p>
         </article>
       </div>
     </section>
 
-    <section class="section section-narrow">
-      <div class="section-heading centered">
+    <section class="section section-narrow content-section" data-scroll-section>
+      <div class="section-heading centered section-intro">
         <div class="section-badge">使用流程</div>
         <h2>三步开启旅程</h2>
       </div>
 
       <div class="steps-grid">
-        <article v-for="(step, index) in steps" :key="step.title" class="step-card reveal-card" :style="{ animationDelay: `${index * 0.15}s` }">
+        <article v-for="(step, index) in steps" :key="step.title" class="step-card reveal-item">
           <div class="step-number">0{{ index + 1 }}</div>
           <h3>{{ step.title }}</h3>
           <p>{{ step.description }}</p>
@@ -71,14 +77,14 @@
       </div>
     </section>
 
-    <section class="section section-wide pricing-section">
-      <div class="section-heading centered">
+    <section class="section section-wide pricing-section content-section" data-scroll-section>
+      <div class="section-heading centered section-intro">
         <div class="section-badge">定价方案</div>
         <h2>选择适合您的方案</h2>
       </div>
 
       <div class="pricing-grid">
-        <article v-for="plan in pricing" :key="plan.name" class="pricing-card reveal-card" :class="{ 'pricing-card--featured': plan.featured }">
+        <article v-for="plan in pricing" :key="plan.name" class="pricing-card reveal-item" :class="{ 'pricing-card--featured': plan.featured }">
           <div class="pricing-head">
             <div>
               <p class="pricing-name">{{ plan.name }}</p>
@@ -101,10 +107,12 @@
       </div>
     </section>
 
-    <section class="section bottom-cta">
-      <h2>准备好了吗？</h2>
-      <p>先让视觉打动人，再让系统把效率撑起来。下一步可以从一次试用开始。</p>
-      <div class="bottom-actions">
+    <section class="section bottom-cta content-section" data-scroll-section>
+      <div class="section-intro centered">
+        <h2>准备好了吗？</h2>
+        <p>先让视觉打动人，再让系统把效率撑起来。下一步可以从一次试用开始。</p>
+      </div>
+      <div class="bottom-actions reveal-item reveal-item--center">
         <RouterLink class="hero-primary" to="/signin">
           免费开始
           <span aria-hidden="true">↗</span>
@@ -125,31 +133,32 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, onMounted, watch } from 'vue';
+import { nextTick, onBeforeUnmount, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
+let sectionObserver: IntersectionObserver | null = null;
 
 const features = [
   {
     icon: '✦',
     title: 'AI 智能设计',
-    description: '基于深度学习的设计引擎，自动生成符合品牌调性的精美界面，并保留人工精调空间。',
+    description: '基于深度学习的设计引擎，自动生成符合品牌调性的精美界面，每一个像素都经过精心优化。',
   },
   {
     icon: '◫',
     title: '组件化架构',
-    description: '模块化的设计系统，灵活组合、快速迭代，让复杂页面也能稳定复用。',
+    description: '模块化的设计系统，灵活组合，快速迭代。从原型到上线，一气呵成。',
   },
   {
     icon: '◎',
     title: '全球化部署',
-    description: '一键分发到全球节点，缩短首屏等待时间，让访问体验更平滑。',
+    description: '一键部署至全球 CDN 节点，确保您的用户无论身处何地，都能享受极速加载体验。',
   },
   {
-    icon: '◌',
+    icon: '⌘',
     title: '性能极致优化',
-    description: '自动代码分割、媒体压缩与懒加载，让高质感页面依然保持轻快。',
+    description: '自动代码分割、图片优化、懒加载。每一项技术细节都为速度而生。',
   },
 ] as const;
 
@@ -198,12 +207,44 @@ async function scrollToFeaturesIfNeeded(path: string): Promise<void> {
   document.getElementById('features')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-onMounted(() => {
+function setupSectionReveal(): void {
+  sectionObserver?.disconnect();
+
+  const sections = document.querySelectorAll<HTMLElement>('[data-scroll-section]');
+  sectionObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        entry.target.classList.toggle('is-visible', entry.isIntersecting);
+      });
+    },
+    {
+      threshold: 0.24,
+      rootMargin: '0px 0px -8% 0px',
+    },
+  );
+
+  sections.forEach((section) => {
+    sectionObserver?.observe(section);
+  });
+}
+
+onMounted(async () => {
+  await nextTick();
+  setupSectionReveal();
   void scrollToFeaturesIfNeeded(route.path);
 });
 
-watch(() => route.path, (path) => {
-  void scrollToFeaturesIfNeeded(path);
+watch(
+  () => route.path,
+  async (path) => {
+    await nextTick();
+    setupSectionReveal();
+    void scrollToFeaturesIfNeeded(path);
+  },
+);
+
+onBeforeUnmount(() => {
+  sectionObserver?.disconnect();
 });
 </script>
 
@@ -211,7 +252,6 @@ watch(() => route.path, (path) => {
 @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap');
 
 .home-page {
-  --bg: #04070a;
   --fg: #f5f7fb;
   --muted: rgba(245, 247, 251, 0.56);
   --line: rgba(245, 247, 251, 0.1);
@@ -271,7 +311,7 @@ watch(() => route.path, (path) => {
 .hero-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.92));
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.92));
 }
 
 .hero-content {
@@ -386,7 +426,7 @@ watch(() => route.path, (path) => {
   margin-bottom: 42px;
 }
 
-.section-heading.centered {
+.centered {
   text-align: center;
 }
 
@@ -408,7 +448,7 @@ watch(() => route.path, (path) => {
 
 .section-heading p,
 .bottom-cta p {
-  max-width: 560px;
+  max-width: 620px;
   margin: 18px auto 0;
   color: rgba(245, 247, 251, 0.5);
   font-size: 0.95rem;
@@ -420,46 +460,74 @@ watch(() => route.path, (path) => {
 .pricing-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 24px;
+  gap: 30px;
 }
 
-.glass-card,
+.feature-card,
 .pricing-card,
 .step-card {
   border: 1px solid var(--line);
-  border-radius: 24px;
-  background: rgba(255, 255, 255, 0.05);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
-  backdrop-filter: blur(14px);
+  border-radius: 28px;
+  background: rgba(0, 0, 0, 0.68);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
-.glass-card {
-  padding: 32px;
+.feature-card {
+  min-height: 336px;
+  padding: 38px 38px 34px;
+  transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
 }
 
-.card-icon {
+.feature-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(245, 247, 251, 0.22);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 24px 48px rgba(0, 0, 0, 0.2);
+}
+
+.feature-icon-ring {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 62px;
+  height: 62px;
+  margin-bottom: 34px;
+  border-radius: 999px;
+  border: 1px solid rgba(245, 247, 251, 0.28);
+  background: rgba(255, 255, 255, 0.03);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.feature-icon {
   display: grid;
   place-items: center;
   width: 48px;
   height: 48px;
-  margin-bottom: 22px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.12);
-  font-size: 1.1rem;
+  color: rgba(245, 247, 251, 0.96);
+  font-size: 1.14rem;
 }
 
-.glass-card h3,
+.feature-card h3,
 .step-card h3,
 .pricing-name {
   margin: 0;
-  font-size: 1.35rem;
+  font-family: 'Instrument Serif', serif;
+  font-size: clamp(2rem, 2.3vw, 2.7rem);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.06;
+  letter-spacing: -0.03em;
 }
 
-.glass-card p,
+.feature-card p,
 .step-card p {
-  margin: 14px 0 0;
-  color: rgba(245, 247, 251, 0.64);
-  line-height: 1.8;
+  max-width: 92%;
+  margin: 22px 0 0;
+  color: rgba(245, 247, 251, 0.56);
+  font-size: 1.02rem;
+  line-height: 1.85;
 }
 
 .steps-grid {
@@ -469,7 +537,7 @@ watch(() => route.path, (path) => {
 }
 
 .step-card {
-  padding: 28px;
+  padding: 32px 28px;
   text-align: center;
 }
 
@@ -569,18 +637,62 @@ watch(() => route.path, (path) => {
   text-decoration: none;
 }
 
-.reveal,
-.reveal-card {
+.hero-reveal {
   opacity: 0;
   transform: translateY(20px);
   filter: blur(10px);
   animation: fade-rise 0.8s ease forwards;
 }
 
-.reveal-1 { animation-delay: 0.1s; }
-.reveal-2 { animation-delay: 0.2s; }
-.reveal-3 { animation-delay: 0.6s; }
-.reveal-4 { animation-delay: 0.9s; }
+.hero-reveal-1 { animation-delay: 0.1s; }
+.hero-reveal-2 { animation-delay: 0.2s; }
+.hero-reveal-3 { animation-delay: 0.6s; }
+.hero-reveal-4 { animation-delay: 0.9s; }
+
+.section-intro,
+.reveal-item {
+  opacity: 0;
+  transform: translateY(30px);
+  filter: blur(12px);
+  transition:
+    opacity 0.82s ease,
+    transform 0.82s ease,
+    filter 0.82s ease;
+}
+
+.content-section.is-visible .section-intro,
+.content-section.is-visible .reveal-item {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+.content-section.is-visible .feature-card:nth-child(1),
+.content-section.is-visible .step-card:nth-child(1),
+.content-section.is-visible .pricing-card:nth-child(1) {
+  transition-delay: 0.06s;
+}
+
+.content-section.is-visible .feature-card:nth-child(2),
+.content-section.is-visible .step-card:nth-child(2),
+.content-section.is-visible .pricing-card:nth-child(2) {
+  transition-delay: 0.14s;
+}
+
+.content-section.is-visible .feature-card:nth-child(3),
+.content-section.is-visible .step-card:nth-child(3),
+.content-section.is-visible .pricing-card:nth-child(3) {
+  transition-delay: 0.22s;
+}
+
+.content-section.is-visible .feature-card:nth-child(4),
+.content-section.is-visible .pricing-card:nth-child(4) {
+  transition-delay: 0.3s;
+}
+
+.reveal-item--center {
+  display: flex;
+}
 
 @keyframes fade-rise {
   to {
@@ -665,6 +777,17 @@ watch(() => route.path, (path) => {
   .pricing-grid,
   .steps-grid {
     grid-template-columns: 1fr;
+  }
+
+  .feature-card {
+    min-height: auto;
+    padding: 30px 26px;
+  }
+
+  .feature-card p {
+    max-width: 100%;
+    font-size: 0.96rem;
+    line-height: 1.75;
   }
 
   .section,
